@@ -1,0 +1,3 @@
+/Users/leog/CLionProjects/TermSage/cmake-build-debug/CMakeFiles/TermSage.dir
+/Users/leog/CLionProjects/TermSage/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/leog/CLionProjects/TermSage/cmake-build-debug/CMakeFiles/rebuild_cache.dir
