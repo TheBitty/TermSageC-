@@ -35073,15 +35073,23 @@ namespace ollama
             const message_type& get_type() const { return type; }
 
         private:
+    class response {
 
-        message_type type;
+        private:
+            std::string json_string;
+            std::string simple_string;
+            std::string error_string;
+            json json_data;        
+            message_type type;
+            bool valid;
+
+        public:
     };
 
     class response {
 
         public:
 
-            response(const std::string& json_string, message_type type=message_type::generation): type(type)
             {
                 this->json_string = json_string;
                 try 
@@ -35138,11 +35146,10 @@ namespace ollama
             }
 
             //operator std::string() const { return this->as_simple_string(); }
-            operator std::__cxx11::basic_string<char>() const { return this->as_simple_string(); }
+            operator std::string() const { return this->as_simple_string(); }
             //const operator std::string() const { return this->as_simple_string(); }           
 
 
-        private:
 
         std::string json_string;
         std::string simple_string;
