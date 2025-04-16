@@ -1,0 +1,3 @@
+/Users/leog/Desktop/TermSageC-/build/CMakeFiles/TermSage.dir
+/Users/leog/Desktop/TermSageC-/build/CMakeFiles/edit_cache.dir
+/Users/leog/Desktop/TermSageC-/build/CMakeFiles/rebuild_cache.dir
