@@ -1,7 +1,9 @@
+#define CPPHTTPLIB_OPENSSL_SUPPORT 0
 #include "ExternalDependencies/ollama_fixed.hpp"
 #include <iostream>
 #include <string>
 #include <limits>
+#include <vector>
 
 int main() {
     // Create an Ollama instance
@@ -23,14 +25,37 @@ int main() {
         return 1;
     }
     
-    for (const auto& model : models) {
-        std::cout << "  - " << model << std::endl;
+    // Display models with numbers
+    std::vector<std::string> model_names;
+    for (size_t i = 0; i < models.size(); i++) {
+        std::cout << "  " << (i + 1) << ". " << models[i] << std::endl;
+        model_names.push_back(models[i]);
     }
     
     // Select model
+    std::string user_input;
     std::string model_name;
-    std::cout << "\nEnter model name to chat with: ";
-    std::getline(std::cin, model_name);
+    bool valid_selection = false;
+    
+    while (!valid_selection) {
+        std::cout << "\nSelect model by number (1-" << models.size() << ") or enter model name: ";
+        std::getline(std::cin, user_input);
+        
+        // Check if input is a number
+        try {
+            int selection = std::stoi(user_input);
+            if (selection >= 1 && selection <= static_cast<int>(models.size())) {
+                model_name = model_names[selection - 1];
+                valid_selection = true;
+            } else {
+                std::cout << "Invalid selection. Please try again." << std::endl;
+            }
+        } catch (const std::exception&) {
+            // Input is not a number, treat as model name
+            model_name = user_input;
+            valid_selection = true;
+        }
+    }
     
     // Initialize chat session
     ollama::messages chat_history;
@@ -38,25 +63,26 @@ int main() {
     // Add system message if desired
     chat_history.add_system("You are a helpful AI assistant.");
     
-    std::string user_input;
+    std::string user_message;
     
     std::cout << "\nChat started with " << model_name << ". Type 'exit' to quit.\n" << std::endl;
     
     while (true) {
         // Get user input
         std::cout << "You: ";
-        std::getline(std::cin, user_input);
+        std::getline(std::cin, user_message);
         
         // Check for exit command
-        if (user_input == "exit" || user_input == "quit") {
+        if (user_message == "exit" || user_message == "quit") {
             break;
         }
         
         // Add user message to history
-        chat_history.add_user(user_input);
+        chat_history.add_user(user_message);
         
         try {
             // Generate response
+            std::cout << "Waiting for response..." << std::endl;
             auto response = ollama.chat(model_name, chat_history);
             
             // Check for errors

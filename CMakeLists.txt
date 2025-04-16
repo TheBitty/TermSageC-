@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required packages
-find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # Add source files
 set(SOURCES
@@ -16,8 +16,9 @@ set(SOURCES
 # Include directories - include both the local project src directory and system includes
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
-    ${OPENSSL_INCLUDE_DIR}
     ${CURL_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
+    /opt/homebrew/opt/openssl/include
 )
 
 # Add executable

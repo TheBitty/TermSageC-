@@ -9949,8 +9949,8 @@ inline Client::Client(const std::string &scheme_host_port,
       is_ssl_ = is_ssl;
 #endif
     } else {
-      cli_ = detail::make_unique<ClientImpl>(host, port, client_cert_path,
-                                             client_key_path);
+    cli_ = detail::make_unique<ClientImpl>(host, port, client_cert_path,
+                                           client_key_path);
     }
   } else {
     // NOTE: Update TEST(UniversalClientImplTest, Ipv6LiteralAddress)

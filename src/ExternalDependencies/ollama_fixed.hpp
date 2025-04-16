@@ -12,9 +12,8 @@
 // Include the nlohmann/json library
 #include "./nlohmann/json.hpp"
 
-// Include the cpp-httplib library
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "./cpp-httplib/httplib.h"
+// Include our custom httplib implementation without SSL dependency
+#include "./cpp-httplib-no-ssl.h"
 
 namespace ollama {
     using json = nlohmann::json;
@@ -199,7 +198,7 @@ public:
 
     bool is_running() {
         auto res = cli->Get("/");
-        if (res && res->body == "Ollama is running") return true;
+        if (res && res->status == 200 && res->body == "Ollama is running") return true;
         return false;
     }
 
@@ -215,13 +214,14 @@ public:
 
     json running_model_json() {
         json models;
-        if (auto res = cli->Get("/api/ps")) {
+        auto res = cli->Get("/api/ps");
+        
+        if (res && res->status == 200) {
             if (ollama::log_replies) std::cout << res->body << std::endl;
             models = json::parse(res->body);
         } else { 
             if (ollama::use_exceptions) 
-                throw ollama::exception("No response returned from server when querying running models: " + 
-                                      std::to_string(static_cast<int>(res.error())));
+                throw ollama::exception("No response returned from server when querying running models");
         }
         return models;
     }
@@ -238,13 +238,14 @@ public:
 
     json list_model_json() {
         json models;
-        if (auto res = cli->Get("/api/tags")) {
+        auto res = cli->Get("/api/tags");
+        
+        if (res && res->status == 200) {
             if (ollama::log_replies) std::cout << res->body << std::endl;
             models = json::parse(res->body);
         } else { 
             if (ollama::use_exceptions) 
-                throw ollama::exception("No response returned from server when querying model list: " + 
-                                      std::to_string(static_cast<int>(res.error())));
+                throw ollama::exception("No response returned from server when querying model list");
         }
         return models;
     }
@@ -256,14 +257,15 @@ public:
         if (ollama::log_requests) std::cout << request_string << std::endl;
 
         // Send a blank request with the model name to instruct ollama to load the model into memory.
-        if (auto res = this->cli->Post("/api/generate", request_string, "application/json")) {
+        auto res = this->cli->Post("/api/generate", request_string, "application/json");
+        
+        if (res && res->status == 200) {
             if (ollama::log_replies) std::cout << res->body << std::endl;
             json response = json::parse(res->body);
-            return response["done"];        
+            return response["done"];
         } else { 
             if (ollama::use_exceptions) 
-                throw ollama::exception("No response returned from server when loading model: " + 
-                                      std::to_string(static_cast<int>(res.error())));
+                throw ollama::exception("No response returned from server when loading model");
         }
         return false;
     }
@@ -284,20 +286,21 @@ public:
         }
         
         std::string request_string = request.dump();
-        if (ollama::log_requests) std::cout << request_string << std::endl;      
+        if (ollama::log_requests) std::cout << request_string << std::endl;
 
-        if (auto res = this->cli->Post("/api/chat", request_string, "application/json")) {
+        auto res = this->cli->Post("/api/chat", request_string, "application/json");
+        
+        if (res && res->status == 200) {
             if (ollama::log_replies) std::cout << res->body << std::endl;
-
             response = ollama::response(res->body, ollama::message_type::chat);
+            
             if (response.has_error()) { 
                 if (ollama::use_exceptions) 
                     throw ollama::exception("Ollama response returned error: " + response.get_error());
             }
         } else {
             if (ollama::use_exceptions) 
-                throw ollama::exception("No response returned from server " + this->server_url + 
-                                      ". Error: " + std::to_string(static_cast<int>(res.error())));
+                throw ollama::exception("No response returned from server " + this->server_url);
         }
 
         return response;

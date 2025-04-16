@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/leog/Desktop/TermSageC-/src -isystem /opt/homebrew/include
+CXX_INCLUDES = -I/Users/leog/Desktop/TermSageC-/src -I/opt/homebrew/opt/openssl/include -isystem /opt/homebrew/include
 
 CXX_FLAGSarm64 = -std=gnu++20 -arch arm64 -Wall -Wextra
 
